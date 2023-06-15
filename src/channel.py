@@ -11,7 +11,8 @@ class Channel:
     def __init__(self, channel_id: str) -> None:
         """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
         self.channel_id = channel_id
-        self.channel_info = None
+        self.name = None
+        self.description = None
         self.channel_statistics = None
         self.url = None
         self.sub_count = None
@@ -27,7 +28,8 @@ class Channel:
         ).execute()
 
         if 'items' in channel_data:
-            self.channel_info = channel_data['items'][0]['snippet']
+            self.name = channel_data['items'][0]['snippet']['title']
+            self.description = channel_data['items'][0]['snippet']['description']
             self.channel_statistics = channel_data['items'][0]['statistics']
             self.url = channel_data['items'][0]['snippet']['customUrl']
             self.sub_count = channel_data['items'][0]['statistics']['subscriberCount']
@@ -43,11 +45,14 @@ class Channel:
         """Сохраняет значения атрибутов экземпляра Channel в файл в формате JSON."""
         data = {
             'channel_id': self.channel_id,
-            'channel_info': self.channel_info,
-            'channel_statistics': self.channel_statistics
+            'channel_name': self.name,
+            'channel_description': self.description,
+            'channel_statistics': self.channel_statistics,
+            'channel_url': self.url,
+            'channel_sub_count': self.sub_count,
+            'channel_vid_count': self.vid_count,
+            'channel_views_count': self.views_count
         }
 
         with open(file_path, 'w') as file:
             json.dump(data, file)
-
-
