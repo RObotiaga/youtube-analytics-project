@@ -2,7 +2,7 @@ import os
 import json
 from googleapiclient.discovery import build
 
-api_key: str = os.getenv('YT_API_KEY')
+api_key: str = 'AIzaSyAbxR8-99iQYeBB26uRYFKi-EORwBFi57E'
 youtube = build('youtube', 'v3', developerKey=api_key)
 
 class Channel:
@@ -19,7 +19,20 @@ class Channel:
         self.vid_count = None
         self.views_count = None
         self.get_channel_data()
-
+    def __str__(self):
+        return f"{self.name} ({self.url})"
+    def __add__(self, other):
+        return int(self.sub_count) + int(other.sub_count)
+    def __sub__(self, other):
+        return int(self.sub_count) - int(other.sub_count)
+    def __lt__(self, other):
+        return int(self.sub_count) < int(other.sub_count)
+    def __le__(self, other):
+        return int(self.sub_count) <= int(other.sub_count)
+    def __gt__(self, other):
+        return int(self.sub_count) > int(other.sub_count)
+    def __ge__(self, other):
+        return int(self.sub_count) >= int(other.sub_count)
     def get_channel_data(self) -> None:
         """Получает информацию о канале и его статистику через API."""
         channel_data = youtube.channels().list(
