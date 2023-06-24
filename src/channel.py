@@ -2,13 +2,14 @@ import os
 import json
 from googleapiclient.discovery import build
 
-api_key: str = os.getenv('YT_API_KEY')
+api_key = os.getenv('YT_API_KEY')
 youtube = build('youtube', 'v3', developerKey=api_key)
+
 
 class Channel:
     """Класс для ютуб-канала"""
 
-    def __init__(self, channel_id: str) -> None:
+    def __init__(self, channel_id):
         """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
         self.channel_id = channel_id
         self.name = None
@@ -19,21 +20,29 @@ class Channel:
         self.vid_count = None
         self.views_count = None
         self.get_channel_data()
+
     def __str__(self):
         return f"{self.name} ({self.url})"
+
     def __add__(self, other):
         return int(self.sub_count) + int(other.sub_count)
+
     def __sub__(self, other):
         return int(self.sub_count) - int(other.sub_count)
+
     def __lt__(self, other):
         return int(self.sub_count) < int(other.sub_count)
+
     def __le__(self, other):
         return int(self.sub_count) <= int(other.sub_count)
+
     def __gt__(self, other):
         return int(self.sub_count) > int(other.sub_count)
+
     def __ge__(self, other):
         return int(self.sub_count) >= int(other.sub_count)
-    def get_channel_data(self) -> None:
+
+    def get_channel_data(self):
         """Получает информацию о канале и его статистику через API."""
         channel_data = youtube.channels().list(
             id=self.channel_id,
@@ -54,7 +63,7 @@ class Channel:
         """Возвращает объект для работы с YouTube API."""
         return youtube
 
-    def to_json(self, file_path: str) -> None:
+    def to_json(self, file_path):
         """Сохраняет значения атрибутов экземпляра Channel в файл в формате JSON."""
         data = {
             'channel_id': self.channel_id,
