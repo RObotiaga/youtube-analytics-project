@@ -1,7 +1,7 @@
-import os
+import os, isodate
 from googleapiclient.discovery import build
 
-api_key = os.getenv('YT_API_KEY')
+api_key = 'AIzaSyAbxR8-99iQYeBB26uRYFKi-EORwBFi57E'#os.getenv('YT_API_KEY')
 youtube = build('youtube', 'v3', developerKey=api_key)
 
 
@@ -12,6 +12,7 @@ class Video:
         self.views_count = None
         self.url = None
         self.like_count = None
+        self.duration = None
         self.get_video_data()
 
     def get_video_data(self):
@@ -21,7 +22,8 @@ class Video:
                                            ).execute()
         if 'items' in video_data:
             self.name = video_data['items'][0]['snippet']['title']
-            self.url = f"https://www.youtube.com/watch?v={self.video_id}"
+            self.duration = isodate.parse_duration(video_data['items'][0]['contentDetails']['duration'])
+            self.url = f"https://youtu.be/{self.video_id}"
             self.views_count = video_data['items'][0]['statistics']['viewCount']
             self.like_count = video_data['items'][0]['statistics']['likeCount']
 
@@ -49,19 +51,3 @@ class PLVideo(Video):
     def __str__(self):
         return self.name
 
-
-class Playlist:
-    def __init__(self, playlist_id):
-        self.playlist_id = playlist_id
-        self.name = None
-        self.url = None
-        self.get_playlist_data()
-
-    def get_playlist_data(self):
-        playlist_data = youtube.playlists().list(id=self.playlist_id,
-                                                 part='snippet',
-                                                 maxResults=50,
-                                                 ).execute()
-        if 'items' in playlist_data:
-            self.name = playlist_data['items'][0]['snippet']['title']
-            self.url = f"https://www.youtube.com/playlist?list={self.playlist_id}"
