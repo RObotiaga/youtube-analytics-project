@@ -29,14 +29,10 @@ class Video:
         return self.name
 
 
-class PLVideo:
+class PLVideo(Video):
     def __init__(self, video_id, playlist_id):
-        self.video_id = video_id
+        super().__init__(video_id)
         self.playlist_id = playlist_id
-        self.name = None
-        self.views_count = None
-        self.url = None
-        self.like_count = None
         self.get_video_data()
 
     def get_video_data(self):
@@ -52,3 +48,20 @@ class PLVideo:
 
     def __str__(self):
         return self.name
+
+
+class Playlist:
+    def __init__(self, playlist_id):
+        self.playlist_id = playlist_id
+        self.name = None
+        self.url = None
+        self.get_playlist_data()
+
+    def get_playlist_data(self):
+        playlist_data = youtube.playlists().list(id=self.playlist_id,
+                                                 part='snippet',
+                                                 maxResults=50,
+                                                 ).execute()
+        if 'items' in playlist_data:
+            self.name = playlist_data['items'][0]['snippet']['title']
+            self.url = f"https://www.youtube.com/playlist?list={self.playlist_id}"
