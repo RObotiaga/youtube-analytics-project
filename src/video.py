@@ -1,14 +1,14 @@
 import os, isodate
 from googleapiclient.discovery import build
 
-api_key = 'AIzaSyAbxR8-99iQYeBB26uRYFKi-EORwBFi57E'#os.getenv('YT_API_KEY')
+api_key = os.getenv('YT_API_KEY')
 youtube = build('youtube', 'v3', developerKey=api_key)
 
 
 class Video:
     def __init__(self, video_id):
         self.video_id = video_id
-        self.name = None
+        self.title = None
         self.views_count = None
         self.url = None
         self.like_count = None
@@ -17,18 +17,27 @@ class Video:
 
     def get_video_data(self):
         """Получает информацию о видео и его статистику через API."""
-        video_data = youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
-                                           id=self.video_id
-                                           ).execute()
-        if 'items' in video_data:
-            self.name = video_data['items'][0]['snippet']['title']
-            self.duration = isodate.parse_duration(video_data['items'][0]['contentDetails']['duration'])
-            self.url = f"https://youtu.be/{self.video_id}"
-            self.views_count = video_data['items'][0]['statistics']['viewCount']
-            self.like_count = video_data['items'][0]['statistics']['likeCount']
+        try:
+            video_data = youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
+                                               id=self.video_id
+                                               ).execute()
+            if 'items' in video_data:
+                self.title = video_data['items'][0]['snippet']['title']
+                self.duration = isodate.parse_duration(video_data['items'][0]['contentDetails']['duration'])
+                self.url = f"https://youtu.be/{self.video_id}"
+                self.views_count = video_data['items'][0]['statistics']['viewCount']
+                self.like_count = video_data['items'][0]['statistics']['likeCount']
+        except IndexError:
+            self.title = None
+            self.duration = None
+            self.url = None
+            self.views_count = None
+            self.like_count = None
+            print('Неверный id видео')
+
 
     def __str__(self):
-        return self.name
+        return self.title
 
 
 class PLVideo(Video):
@@ -43,11 +52,11 @@ class PLVideo(Video):
                                            id=self.video_id
                                            ).execute()
         if 'items' in video_data:
-            self.name = video_data['items'][0]['snippet']['title']
+            self.title = video_data['items'][0]['snippet']['title']
             self.url = f"https://www.youtube.com/watch?v={self.video_id}"
             self.views_count = video_data['items'][0]['statistics']['viewCount']
             self.like_count = video_data['items'][0]['statistics']['likeCount']
 
     def __str__(self):
-        return self.name
+        return self.title
 
